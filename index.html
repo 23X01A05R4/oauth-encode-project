@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>New Project EndtoEnd</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f0f2f5; min-height: 100vh; }
+    .auth-wrap { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .page { display: none; width: 360px; }
+    .page.active { display: block; }
+    .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    h2 { margin-bottom: 1.5rem; text-align: center; }
+    input { width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; outline: none; }
+    input:focus { border-color: #3b82f6; }
+    .btn { width: 100%; padding: 0.75rem; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; color: white; margin-bottom: 0.5rem; }
+    .btn-blue   { background: #3b82f6; } .btn-blue:hover   { background: #2563eb; }
+    .btn-green  { background: #22c55e; } .btn-green:hover  { background: #16a34a; }
+    .btn-red    { background: #ef4444; } .btn-red:hover    { background: #dc2626; }
+    .btn-gray   { background: #64748b; } .btn-gray:hover   { background: #475569; }
+    .btn-google { background: white; color: #333; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .btn-google:hover { background: #f8fafc; }
+    .divider { text-align: center; color: #94a3b8; margin: 0.5rem 0; font-size: 0.85rem; }
+    .msg { padding: 0.6rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.88rem; display: none; text-align: center; }
+    .error   { background: #fee2e2; color: #dc2626; display: block; }
+    .success { background: #dcfce7; color: #16a34a; display: block; }
+    .link { text-align: center; margin-top: 1rem; font-size: 0.88rem; color: #666; }
+    .link a { color: #3b82f6; cursor: pointer; }
+
+    /* Dashboard */
+    #dashPage { display: none; }
+    .navbar { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .navbar h3 { color: #1e293b; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-user { color: #64748b; font-size: 0.9rem; }
+    .logout-btn { padding: 0.4rem 1rem; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .dash-container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    .encode-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+    textarea { width: 100%; padding: 0.7rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; outline: none; height: 100px; resize: none; }
+    .btns { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    .result-box { background: #f8fafc; padding: 1rem; border-radius: 8px; font-size: 0.95rem; word-break: break-all; min-height: 60px; margin-bottom: 1rem; border: 1px solid #ddd; }
+    .label { font-size: 0.85rem; color: #64748b; margin-bottom: 0.4rem; }
+    .badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.82rem; margin-bottom: 1rem; }
+    .encode-badge { background: #dbeafe; color: #1d4ed8; }
+    .decode-badge { background: #dcfce7; color: #16a34a; }
+    .history-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .history-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .del-all-btn { padding: 0.4rem 1rem; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { background: #f1f5f9; padding: 0.7rem; text-align: left; border-bottom: 1px solid #ddd; }
+    td { padding: 0.7rem; border-bottom: 1px solid #f1f5f9; word-break: break-all; }
+    tr:hover { background: #f8fafc; }
+    .tag-encode { background: #dbeafe; color: #1d4ed8; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.78rem; }
+    .tag-decode { background: #dcfce7; color: #16a34a; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.78rem; }
+    .del-btn { background: #ef4444; color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; }
+    .empty { text-align: center; color: #94a3b8; padding: 2rem; }
+
+    /* Auth type badges */
+    .auth-badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 10px; margin-left: 0.5rem; }
+    .auth-manual { background: #dbeafe; color: #1d4ed8; }
+    .auth-google { background: #fee2e2; color: #dc2626; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ AUTH PAGES ═══ -->
+<div class="auth-wrap" id="authWrap">
+
+  <!-- Signup -->
+  <div class="page active" id="signupPage">
+    <div class="card">
+      <h2>Create Account</h2>
+      <div class="msg" id="signupMsg"></div>
+      <input type="text"     id="s_username" placeholder="Username"/>
+      <input type="email"    id="s_email"    placeholder="Email"/>
+      <input type="password" id="s_password" placeholder="Password"/>
+      <button class="btn btn-blue" onclick="signup()">Sign Up</button>
+      <div class="divider">— or —</div>
+      <!-- OAuth button -->
+      <button class="btn btn-google" onclick="googleLogin()">
+        <img src="https://www.google.com/favicon.ico" width="18"/> Login with Google
+      </button>
+      <div class="link">Already have account? <a onclick="showAuth('login')">Login</a></div>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div class="page" id="loginPage">
+    <div class="card">
+      <h2>Login</h2>
+      <div class="msg" id="loginMsg"></div>
+      <input type="email"    id="l_email"    placeholder="Email"/>
+      <input type="password" id="l_password" placeholder="Password"/>
+      <button class="btn btn-blue" onclick="login()">Login</button>
+      <div class="divider">— or —</div>
+      <!-- OAuth button -->
+      <button class="btn btn-google" onclick="googleLogin()">
+        <img src="https://www.google.com/favicon.ico" width="18"/> Login with Google
+      </button>
+      <div class="link">No account? <a onclick="showAuth('signup')">Sign Up</a></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="dashPage">
+  <div class="navbar">
+    <h3>⚡ Dashboard</h3>
+    <div class="nav-right">
+      <span class="nav-user">👋 Hello, <b id="navUser"></b></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="dash-container">
+    <div class="encode-card">
+      <h2 style="margin-bottom:1.5rem;">🔒 Encode / Decode</h2>
+      <div class="label">Enter your text:</div>
+      <textarea id="inputText" placeholder="Type anything... like google.com"></textarea>
+      <div class="btns">
+        <button class="btn btn-blue"  onclick="encode()">🔒 Encode</button>
+        <button class="btn btn-green" onclick="decode()">🔓 Decode</button>
+      </div>
+      <div class="label">Result:</div>
+      <div class="result-box" id="resultBox">—</div>
+      <div id="badge"></div>
+      <button class="btn btn-gray" onclick="clearAll()">Clear</button>
+    </div>
+
+    <div class="history-card">
+      <div class="history-top">
+        <h3>📋 My History</h3>
+        <button class="del-all-btn" onclick="deleteAll()">🗑️ Delete All</button>
+      </div>
+      <div id="historyTable"><div class="empty">Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:8000";
+
+  function showAuth(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(name + 'Page').classList.add('active');
+  }
+
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + type;
+  }
+
+  function showDashboard(username) {
+    document.getElementById('authWrap').style.display = 'none';
+    document.getElementById('dashPage').style.display  = 'block';
+    document.getElementById('navUser').textContent = username;
+    loadHistory();
+  }
+
+  // ── Auto login + Google OAuth callback handle ───────────
+  window.onload = () => {
+    // Google OAuth callback — URL lo token untundi
+    const params   = new URLSearchParams(window.location.search);
+    const token    = params.get('token') || localStorage.getItem('token');
+    const username = params.get('username') || localStorage.getItem('username');
+
+    if (params.get('token')) {
+      localStorage.setItem('token', params.get('token'));
+      localStorage.setItem('username', params.get('username'));
+      window.history.replaceState({}, '', '/index.html');
+    }
+
+    if (token && username) {
+      fetch(`${API}/dashboard`, { headers: { "Authorization": "Bearer " + token } })
+        .then(r => r.json())
+        .then(data => { if (data.username) showDashboard(data.username); })
+        .catch(() => {});
+    }
+  };
+
+  // ── Google Login — OAuth ────────────────────────────────
+  function googleLogin() {
+    window.location.href = `${API}/auth/google`;
+  }
+
+  // ── Signup — Authentication ─────────────────────────────
+  async function signup() {
+    const username = document.getElementById('s_username').value.trim();
+    const email    = document.getElementById('s_email').value.trim();
+    const password = document.getElementById('s_password').value;
+    if (!username || !email || !password) return showMsg('signupMsg', 'All fields required', 'error');
+    try {
+      const res  = await fetch(`${API}/signup`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({username, email, password}) });
+      const data = await res.json();
+      if (!res.ok) return showMsg('signupMsg', data.detail, 'error');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      showMsg('signupMsg', 'Account created!', 'success');
+      setTimeout(() => showDashboard(data.username), 700);
+    } catch { showMsg('signupMsg', 'Backend not running!', 'error'); }
+  }
+
+  // ── Login — Authentication ──────────────────────────────
+  async function login() {
+    const email    = document.getElementById('l_email').value.trim();
+    const password = document.getElementById('l_password').value;
+    if (!email || !password) return showMsg('loginMsg', 'All fields required', 'error');
+    try {
+      const res  = await fetch(`${API}/login`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({email, password}) });
+      const data = await res.json();
+      if (!res.ok) return showMsg('loginMsg', data.detail, 'error');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      showMsg('loginMsg', 'Login success!', 'success');
+      setTimeout(() => showDashboard(data.username), 700);
+    } catch { showMsg('loginMsg', 'Backend not running!', 'error'); }
+  }
+
+  // ── Logout ──────────────────────────────────────────────
+  function logout() {
+    localStorage.clear();
+    document.getElementById('dashPage').style.display  = 'none';
+    document.getElementById('authWrap').style.display  = 'flex';
+    showAuth('login');
+  }
+
+  function authHeader() {
+    return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') };
+  }
+
+  // ── Encode — Authorization (only logged in) ─────────────
+  async function encode() {
+    const text = document.getElementById('inputText').value.trim();
+    if (!text) return;
+    const res  = await fetch(`${API}/encode`, { method: 'POST', headers: authHeader(), body: JSON.stringify({text}) });
+    const data = await res.json();
+    if (data.result === "already_encoded") {
+      document.getElementById('resultBox').textContent = "Already encoded!.";
+      document.getElementById('badge').innerHTML = '<span class="badge" style="background:#fef9c3;color:#ca8a04">⚠️ Already encoded!</span>';
+      return;
+    }
+    document.getElementById('resultBox').textContent = data.result;
+    document.getElementById('badge').innerHTML = '<span class="badge encode-badge">🔒 Encoded!</span>';
+    loadHistory();
+  }
+
+  // ── Decode — Authorization (only logged in) ─────────────
+  async function decode() {
+    const text = document.getElementById('inputText').value.trim();
+    if (!text) return;
+    const res  = await fetch(`${API}/decode`, { method: 'POST', headers: authHeader(), body: JSON.stringify({text}) });
+    const data = await res.json();
+    if (data.result === "not_encoded") {
+      document.getElementById('resultBox').textContent = "Not encoded!.";
+      document.getElementById('badge').innerHTML = '<span class="badge" style="background:#fee2e2;color:#dc2626">❌ Not encoded!</span>';
+      return;
+    }
+    document.getElementById('resultBox').textContent = data.result;
+    document.getElementById('badge').innerHTML = '<span class="badge decode-badge">🔓 Decoded!</span>';
+    loadHistory();
+  }
+
+  async function loadHistory() {
+    const res  = await fetch(`${API}/history`, { headers: authHeader() });
+    const data = await res.json();
+    if (data.length === 0) {
+      document.getElementById('historyTable').innerHTML = '<div class="empty">No history yet!</div>';
+      return;
+    }
+    let html = `<table><tr><th>#</th><th>Original</th><th>Converted</th><th>Action</th><th>Time</th><th>Del</th></tr>`;
+    data.forEach(r => {
+      html += `<tr>
+        <td>${r.id}</td>
+        <td>${r.original}</td>
+        <td>${r.converted}</td>
+        <td><span class="tag-${r.action}">${r.action === 'encode' ? '🔒 Encode' : '🔓 Decode'}</span></td>
+        <td>${r.time}</td>
+        <td><button class="del-btn" onclick="deleteOne(${r.id})">🗑️</button></td>
+      </tr>`;
+    });
+    html += '</table>';
+    document.getElementById('historyTable').innerHTML = html;
+  }
+
+  async function deleteOne(id) {
+    await fetch(`${API}/history/${id}`, { method: 'DELETE', headers: authHeader() });
+    loadHistory();
+  }
+
+  async function deleteAll() {
+    await fetch(`${API}/history`, { method: 'DELETE', headers: authHeader() });
+    loadHistory();
+  }
+
+  function clearAll() {
+    document.getElementById('inputText').value = '';
+    document.getElementById('resultBox').textContent = '—';
+    document.getElementById('badge').innerHTML = '';
+  }
+</script>
+</body>
+</html>
