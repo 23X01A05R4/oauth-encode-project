@@ -117,7 +117,7 @@
     <div class="encode-card">
       <h2 style="margin-bottom:1.5rem;">🔒 Encode / Decode</h2>
       <div class="label">Enter your text:</div>
-      <textarea id="inputText" placeholder="Type anything... like google.com"></textarea>
+      <textarea id="inputText" placeholder="Type anything here...."></textarea>
       <div class="btns">
         <button class="btn btn-blue"  onclick="encode()">🔒 Encode</button>
         <button class="btn btn-green" onclick="decode()">🔓 Decode</button>
@@ -139,7 +139,7 @@
 </div>
 
 <script>
-  const API = "http://127.0.0.1:8000";
+  const API = "https://oauth-encode-project.onrender.com";
 
   function showAuth(name) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
