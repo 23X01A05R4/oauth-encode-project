@@ -194,12 +194,11 @@ async def google_callback(request: Request):
         user_id, username = get_or_create_user(email, username)
         jwt_token = make_token(user_id, username, email)
         return RedirectResponse(
-            url=f"http://127.0.0.1:5500/index.html?token={jwt_token}&username={username}"
+            url=f"https://oauth-encode-project.vercel.app?token={jwt_token}&username={username}"
         )
     except Exception as e:
         print("OAuth Error:", e)
-        return RedirectResponse(url=f"http://127.0.0.1:5500/index.html?error=oauth_failed")
-
+        return RedirectResponse(url="https://oauth-encode-project.vercel.app?error=oauth_failed")
 @app.post("/encode")
 def encode(data: TextData, user=Depends(get_user)):
     if is_base64(data.text):
