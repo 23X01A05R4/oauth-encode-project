@@ -1,7 +1,7 @@
 # 🔐 Auth + Encode/Decode Project
 
 A full stack web application with user authentication, Google OAuth, and Base64 encode/decode functionality. Built and deployed end-to-end.
-
+ 
 ## 🌐 Live Demo
 
 | Layer | URL |
